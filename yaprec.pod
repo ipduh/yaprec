@@ -1,0 +1,342 @@
+=head1 NAME
+
+ yaprec
+
+=head3 Description
+
+ Yet Another (Incomplete) Perl Regular Expressions (Reference) Cheatsheet.
+
+=head3 Metacharacters
+
+ \     Quote-literalize-disable the next metacharacter.
+ .     Match any character except newline.
+ ()    Grouping and Capturing.
+ []    Bracketed Character Class.
+ |     Infix 'operator'. Alternate, match one or the other.
+ [^]   Negate bracketed character class
+
+=head4 Anchors
+
+ ^     True at beginning of string.
+ $     True at the end of string.
+
+=head4 Quantifiers
+
+ {n}   Match the Previous exactly n times
+ {n,}  Match the Previous n or more times
+ {n,m} Match the previous at least n times, but not more than m times
+ *     Match the previous 0 or more times   {0,}
+ ?     Match the previous 0 or 1 times      {0,1}
+       ? also changes any maximal quantifier to a minimal quantifier
+ +     Match the previous 1 or more times   {1,}
+       + also changes a maximal quantifier to a posessive quantifier (that does not backtrack)
+
+ Maximal     Minimal     Possessive      Allowed Range
+ {MIN,MAX}   {MIN,MAX}?  {MIN,MAX}?+     Must occur at least MIN times but no more than MAX times
+ {MIN,}      {MIN,}?     {MIN,}?+        Must occur at least MIN times
+ {COUNT}     {COUNT}?    {COUNT}?+       Must match exactly COUNT times
+ *           *?          *+              0 or more times ( {0,}  )
+ +           +?          ++              1 or more times ( {1,}  )
+ ?           ??          ?+              0 or 1 time     ( {0,1} )
+
+=head3 Operators
+
+ =~    Bind the scalar exression to the right on the m// xor s// xor tr/// xor y/// operator to the left
+ !~    Bind the scalar exression to the right on the m// xor s// xor tr/// xor y/// operator to the left
+ m//   Match. Scalar, Boolean, and List context. Quote operator.
+ s///  Substitute. Quote operator.
+ qr//  Quote REx and return 'compiled' regex for future use.
+
+=head4 The tr/// operator does not speak Real Perl REx
+
+ tr///   Transliterate. Quote operator.
+ y///    tr/// synonym
+
+=head4 Delimeters and Quotes
+
+ //    Search the string in the scalar EXPR for PATTERN , EXPR =~ /PATTERN/modifiers  ( m operator implied )
+ ??    Once only match, EXPR =~ ?PATTERN?modifiers  ( m operator implied )
+ ''    Suppress variable interpolation and the six translation escapes
+ {}    Quotes
+ []    Quotes
+ ##    Quotes
+ ()    Quotes
+ <>    Quotes
+ ""    Quotes
+ ``    Quotes
+
+=head3 Character Class Shortcuts
+
+                                            In ASCII with the /a modifier
+ \t  Horizontal character tabulation
+ \n  Newline (LF,NL)
+ \r  Return
+ \f  Line feed
+ \w  Word character                         [A-Za-z0-9_]
+ \W  Non-(word-character)                   [^A-Za-z0-9_]
+ \s  Whitespace                             [\f\n\r\t]
+ \S  Non-whitespace                         [^\f\n\r\t]
+ \d  Digit                                  [0-9]
+ \D  Nondigit                               [^0-9]
+ \h  Horizontal whitespace character
+ \H  Non horizontal whitespace character
+ \v  Vertical whitespace character
+ \V  Non-vertical whitespace character
+
+=head3 Pattern Modifiers
+
+ /i   Ignore alphanumeric case
+ /x   Ignore (most) whitespace and permit comments in pattern
+ /c   Keep current position after a failed match
+ /g   Global match/substitude as often as possible
+ /cg  Allow continued search after failed /g match
+ /s   Treat string as a single line and let . match newline
+ /m   Treat string as multiple lines and let ^ and $ also match next to embedded newline, not just the edges of the string
+ /o   Compile pattern once only
+ /p   Preserve ${^PREMATCH} , ${^MATCH} , ${^POSTMATCH} as in $`, $& and $' without penalizing the entire program
+ /d   Dual ASCII-Unicode mode charset behavior (old default)
+ /a   ASCII charset behavior
+ /aa  ASCIIer charset behavior without Unicode Casefolding
+ /u   Unicode charset behavior
+ /l   The runtime locale's charset behavior (defult under use locale)
+ /e   Evaluate the right side as a Perl expression, use with the s// operator to create a do{Perl code} block on the right
+ /ee  Like /e but adds and eval around the do{Perl code} block on the right
+ /r   Return substitution and leave the original string untouched ( v >= 5.14 )
+
+=head3 Perl REx Pattern Variables
+
+ $`                    Text left of the Match
+ ${^PREMATCH}          Like $` minus the performance penalty
+ $&                    The Match
+ ${^MATCH}             Like $& minus the performance penalty
+ $'                    Text right of the Match
+ ${^POSTMATCH}         Like $' minus the performance penalty
+ $+                    Last capture group
+ @-                    Array with offsets of submatches' starts
+ @+                    Array with offsets of submatches' ends
+ $1                    Holds the 1st captured expression
+                       $1 $2 ... $n holds the nth captured expression
+ $^N                   Holds the most recent capture
+ $^R                   holds the result of the last (?{ CODE } expression
+ %+                    Named capture buffers
+ %-                    Named capture buffers
+ ${^RE_DEBUG_FLAGS}    The current value of the regex debugging flags. Added in 5.10
+ ${^RE_TRIE_MAXBUF}    Controls how certain regex optimisations are applied and how much memory they utilize.
+                       This value by default is 65536 which corresponds to a 512kB temporary cache.
+
+=head3 Other Alphanumeric RegEx Metasymbols and Escape Characters
+
+=head4 More Anchors, Zero-width Assertions
+
+ \b  Match between a "word" and a non-"word" character ( \W\w | \w\W )
+     In a bracketed class [\b] means backspace.
+ \B  Match except at a word boundary ( \W\W )
+ \A  Match only at beginning of string
+ \Z  Match only at the end of string, or before newline at the end
+ \z  Match only at end of string
+ \G  True at end-of-match  position  of prior m//g
+ \G  Match only at pos() (eg the end-of-matching position of previous //g)
+
+=head4 The (8) Six Translation Escapes
+
+ \N{NAME}   Match the named character, alias, or sequence, it requires the charnames module
+ \U         Uppercase until \E
+ \u         Titlecase next character only
+ \l         Lowercase (not foldcase) next character only
+ \L         Lowercase (not foldcase) until \E.
+ \Q         Quote (de-meta) metacharacters until \E.
+ \F         Foldcase (not lowercase) until \E
+ \E         End case (\F,\L,\U) or quotemeta (\Q) translation
+
+=head4 The Rest Alphanumeric Metasymbols
+
+ \0         Match character number zero (U+0,NULL,NULL)
+ \NNN       Match the character given in octal, up to \377
+ \n         Match the nth (n is a decimal number) capture group
+ \g{n}      Match the nth (decimal) captured group  #
+ \g{-n}     Relative backreference to the nth group before  #
+ \a         Match the alert character (ALERT, BEL)
+ \cX        Match control character Control-X
+ \cZ        Match control character Control-Z
+ \c[        Match control character ESC
+ \c?        Match control character DEL
+ \C         Match only one byte (C char) even in UTF-8
+ \e         Match the escape character (ESCAPE, ESC , not backslash)
+ \f         Match the form feed character (FORM FEED,FF)
+ \k<GROUP>  Match the named capture group; also \k'NAME'
+ \K         Keep text to the left of \K out of match
+ \N         Match any character except newline.
+ \o{NNN}    Match the character NNN in octal
+ \p{prop}   Match any character with the prop Unicode property
+ \pP        Match any character with the P Unicode property
+ \P{PROP}   Match any character without the PROP Unicode property
+ \PP        Match any character without the P Unicode property
+ \pM        Match any character that is considered a Unicode mark character
+ \PM        Match any character that is not considered a Unicode mark character
+ \r         Match the return character (usually CARRIAGE RETURN, CR)
+ \R         Match any linebreak grapheme (not in char classes)
+ \x{ABCD}   Match the character given in hexadecimal
+ \X         Match grapheme (not in char classes)
+
+
+=head3 Extented RegEx Sequences
+
+ (?#   )        Comment, Discard
+ (?:   )        Noncapturing Group
+ (?>   )        Possesive Group, no capturing, no backtracking
+ (?a-i )        Enable (adlupimsx), Disable (-imsx) Pattern Modifiers (to outer group)
+ (?a-i:)        Enable (adlupimsx), Disable (-imsx) Pattern Modifiers and make this a Noncapturing block
+ (?^a  )        Reset (to the default option set) and Enable Pattern Modifiers (adlupimsx)
+ (?^a: )        Group-only Parentheses plus reset (to the default option set) and enable modifiers (adlupimsx)
+ (?=   )        True if lookahead assertion succeeds
+ (?!   )        True if lookahead assertion fails
+ (?<=  )        True if lookbehind assertion succeeds
+ (?<!  )        True if lookbehind assertion fails
+ (?| | )        Branch reset for numbered groups
+ (?<NAME>   )   Named Capture Group
+ (?'NAME'   )   Named Capture Group
+ (?{  })        Execute Embeded Perl code , result of last (?{Perl code}) in $^R
+ (??{ })        Match REx from embedded Perl code. It allows you to enter code that evaluates to a valid pattern.
+ (?NUMBER)      Call the independent subexpression in group NUMBER; also (?+NUMBER) , (?-NUMBER) , (?0) , (?R)
+ (?&NAME)       Recurse on group NAME; also (?P>NAME)
+ (?(COND)  |  ) Conditional Interpolation, match with if-then pattern , $^R is not set
+ (?(DEFINE)   ) Define name groups for later "RegEx subroutine."
+                Invocation as (?&NAME) , like (?(COND) ) where COND is always false.
+
+ (*VERB)        Backtracking control verb; also (*VERB:NAME)
+ VERBs          (*ACCEPT), (*COMMIT) , (*FAIL) or (*F) ,
+                (*MARK:NAME) or (*:NAME) , (*PRUNE) or (*PRUNE:NAME)
+                (*SKIP) or (*SKIP:NAME) , (*THEN) or (*THEN:NAME)
+
+
+=head3 Apply Modifiers to all patterns in you scope and other 'use's
+
+ use re "/u";     Unicode mode
+ use re "/d";     Dual ASCII–Unicode mode
+ use re "/l";     8–bit locale mode
+ use re "/a";     ASCII mode, plus Unicode casefolding
+ use re "/aa";    ASCIIer mode, without Unicode casefolding
+ use re "debug";  See Perl REx preapration and trace. Like -Dr, it needs Perl compiled with -DDEBUGGING
+ use utf8;        use UTF-8 in REx literals as well
+
+
+=head3 Pattern Related Perl Builtins
+
+ pos SCALAR        When used with m//g allows you to read or set the offset of the last match.
+ quotemeta EXPR    Backslashes [^A-Za-z_0-9], like \Q...\E
+ reset;            One-match searches ?pattern? are reset to match again.
+ study SCALAR      Analyze string and attempt to optimize matching. It may or may not save time.
+
+
+=head3 POSIX-style Character Classes
+
+ [[:class:]]    Meaning and Equivalencies                        With /a
+ [\p{class}]
+
+ alnum          Any alphanumeric character                    [A-Za-z0-9]
+                \p{X_POSIX_Alnum}                             \p{POSIX_Alnum}
+
+ alpha          Any alphabetic character                      [A-Za-z]
+                Includes Nonletters (Other_Alphabetic)        \p{POSIX_Alpha}
+                \p{X_POSIX_Alpha}
+
+ ascii          ASCII 0-127                                   ASCII 0-127
+                \p{ASCII}                                     \p{ASCII}
+
+ blank          Any horizontal whitespace                     space or horizontal tab
+                \p{X_POSIX_Blank} \p{HorizSpace} \h           \p{POSIX_Blank}
+
+ cntrl          Control Characters                            ASCII 0-31 and 127-159
+                ASCII 0-31 and 127-159                        \p{POSIX_Cntrl}
+                \p{X_POSIX_Cntrl}
+
+ digit          Characters with the Digit Propery             [0-9]
+                and numerical value 0 to 9                    \p{POSIX_Digit} or \d
+                \p{X_POSIX_Digit} or \d
+
+ graph          Complement of Control, Surrogate, and         ASCII 33-126
+                Unassigned non-whitespace characters.         \p{POSIX_Graph}
+                \p{X_POSIX_Graph}
+
+ lower          Lower case characters with                    [a-z]
+                GC: Lowercase_Letter                          \p{POSIX_Lower}
+                and property Other_Lowercase
+                \p{X_POSIX_Lower}
+
+ print          Any graph or non-CNTRL blank character        \p{POSIX_Print}
+                \p{X_POSIX_print}
+
+ punct          Any character with                            \p{POSIX_Punct}
+                GC: Punctuation
+                and the 9 ASCII characters in Symbol
+                \p{X_POSIX_Punct} or \pP
+                Not equivalent to \p{punct}
+
+ space          Characters with the Whitespace Property       All Whitespace ASCII chars
+                \p{X_POSIX_Space} , [\v\h] or [\s\cK]         tab, vertical tab,
+                                                              LF , FF, CR and space
+                                                              \p{POSIX_Space}
+
+ upper          All uppercase (not Titlecase) characters.     [A-Z]
+                GC: Uppercase_Letter or Other_Uppercase       \p{POSIX_Upper}
+                \p{X_POSIX_Upper} or \p{Uppercase}
+
+ word           alnum or                                      [a-zA-Z0-9_]
+                GC: Mark or Connector_Punctuation             \p{POSIX_Word}
+                \p{X_POSIX_Word} or \w
+
+ xdi            Hexadecimal Digits                            [0-9A-Fa-f]
+                \p{X_POSIX_XDigit} \p{Hex_Digit}              \p{POSIX_XDigit}
+                \p{hex}                                       \p{ASCII_Hex_Digit}
+                                                              \p{ahex}
+
+
+
+
+=head3 (
+
+
+=head3 The tr/// operator does not speak Real Perl REx
+
+ tr///   Transliteration
+ y///    tr/// synonym
+
+=head3 tr/// modifiers
+
+ /c  Complement SEARCHLIST
+ /d  Delete found but unreplaced characters
+ /s  Squash duplicate replaced characters
+ /r  Retrun transliteration and leave the original string untouched
+
+=head3 )
+
+=head2
+
+=begin comment
+
+How do you  put Line Breaks?
+an empty =head "works"
+
+=end comment
+
+=head3 Author
+
+ g0 L<http://ipduh.com/contact>
+
+
+=head3 Further
+
+ perlre
+ perlreref
+ perlreapi
+ perlreguts
+ perlrequick
+ perlrecharclass
+ perlrebackslash
+ Programming Perl
+
+=head1 Thanks
+
+ to the Authors of Perl and Programming Perl for putting them together.
+
+=cut
