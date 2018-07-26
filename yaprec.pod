@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
  yaprec
@@ -295,7 +297,6 @@
 
 =head3 (
 
-
 =head3 The tr/// operator does not speak Real Perl REx
 
  tr///   Transliteration
@@ -310,19 +311,9 @@
 
 =head3 )
 
-=head2
-
-=begin comment
-
-How do you  put Line Breaks?
-an empty =head "works"
-
-=end comment
-
 =head3 Author
 
- g0 L<http://ipduh.com/contact>
-
+ g0, wo@ipduh.com
 
 =head3 Further
 
